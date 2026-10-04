@@ -26,16 +26,16 @@ public class StarterbotCommandBasedTeleop extends CommandOpMode {
                 leftFrontName, leftBackName, rightFrontName, rightBackName,
                 pinpointName
         );
+        register(drive); // must be done before setting default command!
 
         driverGamepad = new GamepadEx(gamepad1);
 
         drive.setDefaultCommand(new DriveCommand(
                 drive, true,
-                () -> driverGamepad.getLeftY(),
-                () -> driverGamepad.getLeftX(),
-                () -> driverGamepad.getRightX()
+                () -> -driverGamepad.getLeftY(),
+                () -> -driverGamepad.getLeftX(),
+                () -> -driverGamepad.getRightX(),
+                telemetry
         ));
-
-        register(drive);
     }
 }

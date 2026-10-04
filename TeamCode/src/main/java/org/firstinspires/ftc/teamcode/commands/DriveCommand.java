@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.commands;
 
 import com.seattlesolvers.solverslib.command.CommandBase;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 
 import java.util.function.DoubleSupplier;
@@ -14,18 +15,22 @@ public class DriveCommand extends CommandBase {
 
     private final boolean isFieldCentric;
 
+    private final Telemetry telemetry;
+
     public DriveCommand(
             DriveSubsystem drive,
             boolean isFieldCentric,
             DoubleSupplier forwardSupplier,
             DoubleSupplier strafeSupplier,
-            DoubleSupplier rotateSupplier
+            DoubleSupplier rotateSupplier,
+            Telemetry telemetry
     ) {
         this.isFieldCentric = isFieldCentric;
         this.forwardSupplier = forwardSupplier;
         this.strafeSupplier = strafeSupplier;
         this.rotateSupplier = rotateSupplier;
         this.drive = drive;
+        this.telemetry = telemetry;
 
         addRequirements(drive);
     }
@@ -40,6 +45,9 @@ public class DriveCommand extends CommandBase {
         double forward = forwardSupplier.getAsDouble();
         double strafe = strafeSupplier.getAsDouble();
         double rotate = rotateSupplier.getAsDouble();
+
+        telemetry.addData("Drive Control", "forward %.2f, strafe %.2f, rotate %.2f", forward, strafe, rotate);
+        telemetry.update();
 
         if (isFieldCentric)
             drive.driveFieldCentric(forward, strafe, rotate);

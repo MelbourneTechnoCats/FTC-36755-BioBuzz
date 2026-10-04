@@ -41,11 +41,6 @@ public class DriveSubsystem extends SubsystemBase {
         rightFrontDrive = new Motor(hardwareMap, rightFrontName, Motor.GoBILDA.RPM_312);
         rightBackDrive = new Motor(hardwareMap, rightBackName, Motor.GoBILDA.RPM_312);
 
-        leftFrontDrive.setInverted(true);
-        leftBackDrive.setInverted(true);
-        rightFrontDrive.setInverted(false);
-        rightBackDrive.setInverted(false);
-
         leftFrontDrive.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         leftBackDrive.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         rightFrontDrive.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
@@ -61,10 +56,11 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     public void driveRobotCentric(double forward, double strafe, double rotate) {
-        drive.driveRobotCentric(forward, strafe, rotate);
+        drive.driveRobotCentric(strafe, forward, rotate);
     }
 
     public Pose2d getPose() {
+        pinpoint.update();
         Pose2D pose = pinpoint.getPosition();
         return new Pose2d(
                 pose.getX(DistanceUnit.INCH), pose.getY(DistanceUnit.INCH),
@@ -73,6 +69,6 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     public void driveFieldCentric(double forward, double strafe, double rotate) {
-        drive.driveFieldCentric(forward, strafe, rotate, getPose().getHeading());
+        drive.driveFieldCentric(strafe, forward, rotate, getPose().getHeading());
     }
 }
