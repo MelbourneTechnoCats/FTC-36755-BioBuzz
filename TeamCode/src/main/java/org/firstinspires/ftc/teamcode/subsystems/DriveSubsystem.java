@@ -28,7 +28,7 @@ public class DriveSubsystem extends SubsystemBase {
     private final GoBildaPinpointDriver.EncoderDirection PINPOINT_X_DIRECTION
             = GoBildaPinpointDriver.EncoderDirection.FORWARD;
     private final GoBildaPinpointDriver.EncoderDirection PINPOINT_Y_DIRECTION
-            = GoBildaPinpointDriver.EncoderDirection.FORWARD;
+            = GoBildaPinpointDriver.EncoderDirection.REVERSED;
 
     public DriveSubsystem(
             final HardwareMap hardwareMap,
@@ -41,12 +41,17 @@ public class DriveSubsystem extends SubsystemBase {
         rightFrontDrive = new Motor(hardwareMap, rightFrontName, Motor.GoBILDA.RPM_312);
         rightBackDrive = new Motor(hardwareMap, rightBackName, Motor.GoBILDA.RPM_312);
 
+        leftFrontDrive.setInverted(true);
+        rightFrontDrive.setInverted(false);
+        leftBackDrive.setInverted(true);
+        rightBackDrive.setInverted(false);
+
         leftFrontDrive.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         leftBackDrive.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         rightFrontDrive.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         rightBackDrive.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
 
-        drive = new MecanumDrive(leftFrontDrive, rightFrontDrive, leftBackDrive, rightBackDrive);
+        drive = new MecanumDrive(false, leftFrontDrive, rightFrontDrive, leftBackDrive, rightBackDrive);
 
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, pinpointName);
         pinpoint.setOffsets(PINPOINT_X_OFFSET, PINPOINT_Y_OFFSET, DistanceUnit.MM);
@@ -64,11 +69,12 @@ public class DriveSubsystem extends SubsystemBase {
         Pose2D pose = pinpoint.getPosition();
         return new Pose2d(
                 pose.getX(DistanceUnit.INCH), pose.getY(DistanceUnit.INCH),
-                pose.getHeading(AngleUnit.DEGREES)
+                pose.getHeading(AngleUnit.RADIANS) // Pose2d assumes heading in radians
         );
     }
 
     public void driveFieldCentric(double forward, double strafe, double rotate) {
-        drive.driveFieldCentric(strafe, forward, rotate, getPose().getHeading());
+        drive.driveFieldCentric(strafe, forward, rotate, Math.toDegrees(getPose().getHeading()));
+        // driveFieldCentric() assumes heading in degrees
     }
 }

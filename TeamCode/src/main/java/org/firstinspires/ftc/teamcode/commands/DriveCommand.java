@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.commands;
 
 import com.seattlesolvers.solverslib.command.CommandBase;
+import com.seattlesolvers.solverslib.geometry.Pose2d;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
@@ -47,6 +48,8 @@ public class DriveCommand extends CommandBase {
         double rotate = rotateSupplier.getAsDouble();
 
         telemetry.addData("Drive Control", "forward %.2f, strafe %.2f, rotate %.2f", forward, strafe, rotate);
+        Pose2d pose = drive.getPose();
+        telemetry.addData("Robot Pose", "X %.2f, Y %.2f, heading %.2f", pose.getX(), pose.getY(), pose.getHeading());
         telemetry.update();
 
         if (isFieldCentric)
