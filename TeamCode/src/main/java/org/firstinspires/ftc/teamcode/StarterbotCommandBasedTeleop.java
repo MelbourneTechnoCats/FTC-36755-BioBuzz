@@ -3,13 +3,17 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
+import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
 import org.firstinspires.ftc.teamcode.commands.DriveCommand;
+import org.firstinspires.ftc.teamcode.commands.IntakeCommand;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
 
 @TeleOp(name = "Command-Based Teleop", group = "StarterBot")
 public class StarterbotCommandBasedTeleop extends CommandOpMode {
     private DriveSubsystem drive;
+    private IntakeSubsystem intake;
 
     private GamepadEx driverGamepad;
 
@@ -18,6 +22,9 @@ public class StarterbotCommandBasedTeleop extends CommandOpMode {
     private final String leftBackName = "left_back_drive";
     private final String rightBackName = "right_back_drive";
     private final String pinpointName = "pinpoint";
+    private final String intakeMotorName = "intake";
+    private final String leftIntakeServoName = "left_intake_servo";
+    private final String rightIntakeServoName = "right_intake_servo";
 
     @Override
     public void initialize() {
@@ -28,6 +35,12 @@ public class StarterbotCommandBasedTeleop extends CommandOpMode {
         );
         register(drive); // must be done before setting default command!
 
+        intake = new IntakeSubsystem(
+                hardwareMap,
+                intakeMotorName, leftIntakeServoName, rightIntakeServoName
+        );
+        register(intake);
+
         driverGamepad = new GamepadEx(gamepad1);
 
         drive.setDefaultCommand(new DriveCommand(
@@ -36,6 +49,16 @@ public class StarterbotCommandBasedTeleop extends CommandOpMode {
                 () -> driverGamepad.getLeftX(),
                 () -> driverGamepad.getRightX(),
                 telemetry
+        ));
+
+        intake.setDefaultCommand(new IntakeCommand(
+                intake,
+                () -> {
+                    return (
+                            driverGamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER)
+                            - driverGamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER)
+                    );
+                }
         ));
     }
 }
