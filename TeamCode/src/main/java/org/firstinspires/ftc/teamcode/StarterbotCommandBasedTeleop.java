@@ -20,17 +20,6 @@ public class StarterbotCommandBasedTeleop extends CommandOpMode {
 
     private GamepadEx driverGamepad;
 
-    private final String leftFrontName = "left_front_drive";
-    private final String rightFrontName = "right_front_drive";
-    private final String leftBackName = "left_back_drive";
-    private final String rightBackName = "right_back_drive";
-    private final String pinpointName = "pinpoint";
-    private final String intakeMotorName = "intake";
-    private final String leftIntakeServoName = "left_intake_servo";
-    private final String rightIntakeServoName = "right_intake_servo";
-    private final String launcherMotorName = "launcher";
-    private final String windmillServoName = "windmillServo";
-
     private final double SHOOTER_SPEED = 1500;
 
     private boolean isFieldCentric = true;
@@ -39,20 +28,22 @@ public class StarterbotCommandBasedTeleop extends CommandOpMode {
     public void initialize() {
         drive = new DriveSubsystem(
                 hardwareMap,
-                leftFrontName, leftBackName, rightFrontName, rightBackName,
-                pinpointName
+                RobotConstants.LEFT_FRONT_NAME, RobotConstants.LEFT_BACK_NAME,
+                RobotConstants.RIGHT_FRONT_NAME, RobotConstants.RIGHT_BACK_NAME,
+                RobotConstants.PINPOINT_NAME
         );
         register(drive); // must be done before setting default command!
 
         intake = new IntakeSubsystem(
                 hardwareMap,
-                intakeMotorName, leftIntakeServoName, rightIntakeServoName
+                RobotConstants.INTAKE_MOTOR_NAME,
+                RobotConstants.LEFT_INTAKE_SERVO_NAME, RobotConstants.RIGHT_INTAKE_SERVO_NAME
         );
         register(intake);
 
         shooter = new ShooterSubsystem(
                 hardwareMap,
-                launcherMotorName, windmillServoName
+                RobotConstants.LAUNCHER_MOTOR_NAME, RobotConstants.WINDMILL_SERVO_NAME
         );
         register(shooter);
 
