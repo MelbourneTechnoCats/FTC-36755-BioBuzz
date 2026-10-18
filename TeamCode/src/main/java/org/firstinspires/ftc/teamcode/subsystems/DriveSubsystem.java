@@ -21,8 +21,8 @@ public class DriveSubsystem extends SubsystemBase {
 
     private final MecanumDrive drive;
 
-    private final double PINPOINT_X_OFFSET = 0.0;
-    private final double PINPOINT_Y_OFFSET = 0.0;
+    private final double PINPOINT_X_OFFSET = 60.0;
+    private final double PINPOINT_Y_OFFSET = -70.0;
     // in mm
 
     private final GoBildaPinpointDriver.EncoderDirection PINPOINT_X_DIRECTION
