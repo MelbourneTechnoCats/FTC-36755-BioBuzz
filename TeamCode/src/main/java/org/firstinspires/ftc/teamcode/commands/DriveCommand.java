@@ -6,6 +6,7 @@ import com.seattlesolvers.solverslib.geometry.Pose2d;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 public class DriveCommand extends CommandBase {
@@ -14,26 +15,32 @@ public class DriveCommand extends CommandBase {
     private final DoubleSupplier strafeSupplier;
     private final DoubleSupplier rotateSupplier;
 
-    private final boolean isFieldCentric;
+    private final BooleanSupplier modeSupplier;
 
-    private final Telemetry telemetry;
+    public DriveCommand(
+            DriveSubsystem drive,
+            BooleanSupplier modeSupplier,
+            DoubleSupplier forwardSupplier,
+            DoubleSupplier strafeSupplier,
+            DoubleSupplier rotateSupplier
+    ) {
+        this.modeSupplier = modeSupplier;
+        this.forwardSupplier = forwardSupplier;
+        this.strafeSupplier = strafeSupplier;
+        this.rotateSupplier = rotateSupplier;
+        this.drive = drive;
+
+        addRequirements(drive);
+    }
 
     public DriveCommand(
             DriveSubsystem drive,
             boolean isFieldCentric,
             DoubleSupplier forwardSupplier,
             DoubleSupplier strafeSupplier,
-            DoubleSupplier rotateSupplier,
-            Telemetry telemetry
+            DoubleSupplier rotateSupplier
     ) {
-        this.isFieldCentric = isFieldCentric;
-        this.forwardSupplier = forwardSupplier;
-        this.strafeSupplier = strafeSupplier;
-        this.rotateSupplier = rotateSupplier;
-        this.drive = drive;
-        this.telemetry = telemetry;
-
-        addRequirements(drive);
+        this(drive, () -> isFieldCentric, forwardSupplier, strafeSupplier, rotateSupplier);
     }
 
     @Override
@@ -47,12 +54,7 @@ public class DriveCommand extends CommandBase {
         double strafe = strafeSupplier.getAsDouble();
         double rotate = rotateSupplier.getAsDouble();
 
-        telemetry.addData("Drive Control", "forward %.2f, strafe %.2f, rotate %.2f", forward, strafe, rotate);
-        Pose2d pose = drive.getPose();
-        telemetry.addData("Robot Pose", "X %.2f, Y %.2f, heading %.2f", pose.getX(), pose.getY(), pose.getHeading());
-        telemetry.update();
-
-        if (isFieldCentric)
+        if (modeSupplier.getAsBoolean())
             drive.driveFieldCentric(forward, strafe, rotate);
         else
             drive.driveRobotCentric(forward, strafe, rotate);

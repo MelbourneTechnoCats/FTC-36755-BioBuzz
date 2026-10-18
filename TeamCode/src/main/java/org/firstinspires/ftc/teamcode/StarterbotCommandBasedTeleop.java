@@ -26,6 +26,8 @@ public class StarterbotCommandBasedTeleop extends CommandOpMode {
     private final String leftIntakeServoName = "left_intake_servo";
     private final String rightIntakeServoName = "right_intake_servo";
 
+    private boolean isFieldCentric = true;
+
     @Override
     public void initialize() {
         drive = new DriveSubsystem(
@@ -44,11 +46,10 @@ public class StarterbotCommandBasedTeleop extends CommandOpMode {
         driverGamepad = new GamepadEx(gamepad1);
 
         drive.setDefaultCommand(new DriveCommand(
-                drive, true,
+                drive, () -> isFieldCentric,
                 () -> driverGamepad.getLeftY(),
                 () -> driverGamepad.getLeftX(),
-                () -> driverGamepad.getRightX(),
-                telemetry
+                () -> driverGamepad.getRightX()
         ));
 
         intake.setDefaultCommand(new IntakeCommand(
@@ -60,5 +61,17 @@ public class StarterbotCommandBasedTeleop extends CommandOpMode {
                     );
                 }
         ));
+
+        publishFieldCentricToTelemetry();
+        driverGamepad.getGamepadButton(GamepadKeys.Button.PS)
+                .whenPressed(() -> {
+                    isFieldCentric = !isFieldCentric;
+                    publishFieldCentricToTelemetry();
+                });
+    }
+
+    void publishFieldCentricToTelemetry() {
+        telemetry.addData("Field-Centric", isFieldCentric);
+        telemetry.update();
     }
 }
