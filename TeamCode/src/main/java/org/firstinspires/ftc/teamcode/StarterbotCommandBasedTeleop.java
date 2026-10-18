@@ -7,13 +7,16 @@ import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
 import org.firstinspires.ftc.teamcode.commands.DriveCommand;
 import org.firstinspires.ftc.teamcode.commands.IntakeCommand;
+import org.firstinspires.ftc.teamcode.commands.ShootCommand;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.ShooterSubsystem;
 
 @TeleOp(name = "Command-Based Teleop", group = "StarterBot")
 public class StarterbotCommandBasedTeleop extends CommandOpMode {
     private DriveSubsystem drive;
     private IntakeSubsystem intake;
+    private ShooterSubsystem shooter;
 
     private GamepadEx driverGamepad;
 
@@ -25,6 +28,10 @@ public class StarterbotCommandBasedTeleop extends CommandOpMode {
     private final String intakeMotorName = "intake";
     private final String leftIntakeServoName = "left_intake_servo";
     private final String rightIntakeServoName = "right_intake_servo";
+    private final String launcherMotorName = "launcher";
+    private final String windmillServoName = "windmillServo";
+
+    private final double SHOOTER_SPEED = 1500;
 
     private boolean isFieldCentric = true;
 
@@ -43,6 +50,12 @@ public class StarterbotCommandBasedTeleop extends CommandOpMode {
         );
         register(intake);
 
+        shooter = new ShooterSubsystem(
+                hardwareMap,
+                launcherMotorName, windmillServoName
+        );
+        register(shooter);
+
         driverGamepad = new GamepadEx(gamepad1);
 
         drive.setDefaultCommand(new DriveCommand(
@@ -55,12 +68,18 @@ public class StarterbotCommandBasedTeleop extends CommandOpMode {
         intake.setDefaultCommand(new IntakeCommand(
                 intake,
                 () -> {
-                    return (
+                    double power = (
                             driverGamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER)
                             - driverGamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER)
                     );
+                    if (shooter.isTargetVelocityReached())
+                        power += 0.5;
+                    return power;
                 }
         ));
+
+        driverGamepad.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
+                .whenHeld(new ShootCommand(shooter, SHOOTER_SPEED));
 
         publishFieldCentricToTelemetry();
         driverGamepad.getGamepadButton(GamepadKeys.Button.PS)
