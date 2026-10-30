@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import static org.firstinspires.ftc.teamcode.RobotConstants.PINPOINT_X_OFFSET;
+import static org.firstinspires.ftc.teamcode.RobotConstants.PINPOINT_Y_OFFSET;
+
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
@@ -20,10 +23,6 @@ public class DriveSubsystem extends SubsystemBase {
     private final GoBildaPinpointDriver pinpoint;
 
     private final MecanumDrive drive;
-
-    private final double PINPOINT_X_OFFSET = 60.0;
-    private final double PINPOINT_Y_OFFSET = -70.0;
-    // in mm
 
     private final GoBildaPinpointDriver.EncoderDirection PINPOINT_X_DIRECTION
             = GoBildaPinpointDriver.EncoderDirection.FORWARD;
