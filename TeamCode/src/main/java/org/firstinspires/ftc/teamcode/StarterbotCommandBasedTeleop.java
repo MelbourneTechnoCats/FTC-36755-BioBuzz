@@ -19,8 +19,12 @@ public class StarterbotCommandBasedTeleop extends CommandOpMode {
     private ShooterSubsystem shooter;
 
     private GamepadEx driverGamepad;
+    private GamepadEx mechGamepad;
 
-    private final double SHOOTER_SPEED = 1500;
+    private double shooterSpeed = 1400; // in ticks per second
+
+    private final double SHOOTER_CHANGE_STEP = 100;
+    private final double SHOOTER_MIN_SPEED = 1000;
 
     private boolean isFieldCentric = true;
 
@@ -48,6 +52,7 @@ public class StarterbotCommandBasedTeleop extends CommandOpMode {
         register(shooter);
 
         driverGamepad = new GamepadEx(gamepad1);
+        mechGamepad = new GamepadEx(gamepad2);
 
         drive.setDefaultCommand(new DriveCommand(
                 drive, () -> isFieldCentric,
@@ -69,19 +74,36 @@ public class StarterbotCommandBasedTeleop extends CommandOpMode {
                 }
         ));
 
-        driverGamepad.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
-                .whenHeld(new ShootCommand(shooter, SHOOTER_SPEED));
-
-        publishFieldCentricToTelemetry();
+        updateTelemetry();
         driverGamepad.getGamepadButton(GamepadKeys.Button.PS)
                 .whenPressed(() -> {
                     isFieldCentric = !isFieldCentric;
-                    publishFieldCentricToTelemetry();
+                    updateTelemetry();
+                });
+
+        mechGamepad.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
+                .whenHeld(new ShootCommand(shooter, () -> shooterSpeed));
+        mechGamepad.getGamepadButton(GamepadKeys.Button.DPAD_UP)
+                .whenPressed(() -> {
+                    double newSpeed = shooterSpeed + SHOOTER_CHANGE_STEP;
+                    if (newSpeed <= ShooterSubsystem.MAX_TICKS_PER_SECOND) {
+                        shooterSpeed = newSpeed;
+                        updateTelemetry();
+                    }
+                });
+        mechGamepad.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
+                .whenPressed(() -> {
+                    double newSpeed = shooterSpeed - SHOOTER_CHANGE_STEP;
+                    if (newSpeed >= SHOOTER_MIN_SPEED) {
+                        shooterSpeed = newSpeed;
+                        updateTelemetry();
+                    }
                 });
     }
 
-    void publishFieldCentricToTelemetry() {
+    void updateTelemetry() {
         telemetry.addData("Field-Centric", isFieldCentric);
+        telemetry.addData("Shooter speed", shooterSpeed);
         telemetry.update();
     }
 }
