@@ -19,12 +19,12 @@ public class ShooterSubsystem extends SubsystemBase {
     private final double kS = 73.41;
     private final double kV = 1.073;
 
-    private final double ENCODER_RESOLUTION = 28; // counts per rotation
-    private final double MAX_RPM = 6000;
+    private static final double ENCODER_RESOLUTION = 28; // counts per rotation
+    private static final double MAX_RPM = 6000;
 
-    private final double WINDMILL_THRESHOLD = 0.9; // 90% target velocity minimum
+    private static final double WINDMILL_THRESHOLD = 0.95; // 95% target velocity minimum
 
-    private final double MAX_TICKS_PER_SECOND = (MAX_RPM / 60) * ENCODER_RESOLUTION;
+    public static final double MAX_TICKS_PER_SECOND = (MAX_RPM / 60) * ENCODER_RESOLUTION;
 
     private final Telemetry dashboardTelemetry;
 
