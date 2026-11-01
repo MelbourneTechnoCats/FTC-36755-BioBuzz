@@ -72,6 +72,14 @@ public class DriveSubsystem extends SubsystemBase {
         );
     }
 
+    public void resetHeading(double degrees) {
+        pinpoint.setHeading(degrees, AngleUnit.DEGREES);
+    }
+
+    public void resetHeading() {
+        resetHeading(0);
+    }
+
     public void driveFieldCentric(double forward, double strafe, double rotate) {
         drive.driveFieldCentric(strafe, forward, rotate, Math.toDegrees(getPose().getHeading()));
         // driveFieldCentric() assumes heading in degrees

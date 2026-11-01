@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
+import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
@@ -80,6 +81,11 @@ public class StarterbotCommandBasedTeleop extends CommandOpMode {
                     isFieldCentric = !isFieldCentric;
                     updateTelemetry();
                 });
+        driverGamepad.getGamepadButton(GamepadKeys.Button.TRIANGLE)
+                .whenPressed(new InstantCommand(
+                        () -> { drive.resetHeading(); },
+                        drive
+                ));
 
         mechGamepad.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
                 .whenHeld(new ShootCommand(shooter, () -> shooterSpeed));
