@@ -25,7 +25,7 @@ public class StarterbotCommandBasedTeleop extends CommandOpMode {
 
     private double shooterSpeed = 1400; // in ticks per second
 
-    private final double SHOOTER_CHANGE_STEP = 100;
+    private final double SHOOTER_CHANGE_STEP = 50;
     private final double SHOOTER_MIN_SPEED = 1000;
 
     private boolean isFieldCentric = true;
