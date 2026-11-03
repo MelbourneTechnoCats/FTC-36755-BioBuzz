@@ -5,6 +5,7 @@ import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
+import com.seattlesolvers.solverslib.geometry.Pose2d;
 
 import org.firstinspires.ftc.teamcode.commands.DriveCommand;
 import org.firstinspires.ftc.teamcode.commands.IntakeCommand;
@@ -75,11 +76,9 @@ public class StarterbotCommandBasedTeleop extends CommandOpMode {
                 }
         ));
 
-        updateTelemetry();
         driverGamepad.getGamepadButton(GamepadKeys.Button.PS)
                 .whenPressed(() -> {
                     isFieldCentric = !isFieldCentric;
-                    updateTelemetry();
                 });
         driverGamepad.getGamepadButton(GamepadKeys.Button.TRIANGLE)
                 .whenPressed(new InstantCommand(
@@ -94,7 +93,6 @@ public class StarterbotCommandBasedTeleop extends CommandOpMode {
                     double newSpeed = shooterSpeed + SHOOTER_CHANGE_STEP;
                     if (newSpeed <= ShooterSubsystem.MAX_TICKS_PER_SECOND) {
                         shooterSpeed = newSpeed;
-                        updateTelemetry();
                     }
                 });
         mechGamepad.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
@@ -102,14 +100,21 @@ public class StarterbotCommandBasedTeleop extends CommandOpMode {
                     double newSpeed = shooterSpeed - SHOOTER_CHANGE_STEP;
                     if (newSpeed >= SHOOTER_MIN_SPEED) {
                         shooterSpeed = newSpeed;
-                        updateTelemetry();
                     }
                 });
     }
 
-    void updateTelemetry() {
+    @Override
+    public void run() {
+        super.run();
+
+        // publish robot position data
+        Pose2d pose = drive.getPose();
+        telemetry.addData("Pose", "heading: %.2f deg, X: %.2f in, Y: %.2f in", Math.toDegrees(pose.getHeading()), pose.getX(), pose.getY());
+
         telemetry.addData("Field-Centric", isFieldCentric);
         telemetry.addData("Shooter speed", shooterSpeed);
+
         telemetry.update();
     }
 }
