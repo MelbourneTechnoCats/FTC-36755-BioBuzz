@@ -7,6 +7,7 @@ import com.pedropathing.paths.Path;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
+import com.seattlesolvers.solverslib.geometry.Pose2d;
 import com.seattlesolvers.solverslib.pedroCommand.FollowPathCommand;
 
 import org.firstinspires.ftc.teamcode.commands.ShootCommand;
@@ -45,6 +46,7 @@ public class ShootAndParkAuto extends CommandOpMode {
         reset();
 
         follower = Constants.createFollower(hardwareMap);
+        follower.setPose(startingPose);
 
         shooter = new ShooterSubsystem(hardwareMap, RobotConstants.LAUNCHER_MOTOR_NAME, RobotConstants.WINDMILL_SERVO_NAME);
         register(shooter);
@@ -57,5 +59,18 @@ public class ShootAndParkAuto extends CommandOpMode {
                 new ShootCommand(shooter, SHOOT_SPEED).withTimeout(SHOOT_TIME),
                 new FollowPathCommand(follower, parkPath, false)
         ));
+    }
+
+    @Override
+    public void run() {
+        super.run();
+
+        follower.update(); // REQUIRED FOR DRIVETRAIN TO RUN!!!!
+
+        // publish robot position data
+        Pose pose = follower.pose();
+        telemetry.addData("Pose", "heading: %.2f deg, X: %.2f in, Y: %.2f in", Math.toDegrees(pose.heading()), pose.x(), pose.y());
+
+        telemetry.update();
     }
 }
