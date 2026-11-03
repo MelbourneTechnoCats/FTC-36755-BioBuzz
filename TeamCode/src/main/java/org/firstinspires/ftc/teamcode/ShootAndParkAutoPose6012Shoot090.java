@@ -7,7 +7,6 @@ import com.pedropathing.paths.Path;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
-import com.seattlesolvers.solverslib.geometry.Pose2d;
 import com.seattlesolvers.solverslib.pedroCommand.FollowPathCommand;
 
 import org.firstinspires.ftc.teamcode.commands.ShootCommand;
@@ -15,16 +14,16 @@ import org.firstinspires.ftc.teamcode.pedro.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.ShooterSubsystem;
 
 @Autonomous(name = "Shoot and Park")
-public class ShootAndParkAuto extends CommandOpMode {
+public class ShootAndParkAutoPose6012Shoot090 extends CommandOpMode {
     private Follower follower;
     private ShooterSubsystem shooter;
 
     private Pose startingPose = new Pose(
-            36, 12, Math.toRadians(90)
+            60, 12, Math.toRadians(90)
     );
 
     private Pose shootPose = new Pose(
-            48, 24, Math.toRadians(72 + 180)
+            60, 18, Math.toRadians(90 + 180)
     );
 
     private Pose parkMidPose = new Pose(
