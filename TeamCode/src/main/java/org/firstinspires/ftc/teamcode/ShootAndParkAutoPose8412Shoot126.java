@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.commands.ShootCommand;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.ShooterSubsystem;
 
-@Autonomous(name = "Shoot and Park")
+@Autonomous()
 public class ShootAndParkAutoPose8412Shoot126 extends CommandOpMode {
     private Follower follower;
     private ShooterSubsystem shooter;
@@ -23,11 +23,11 @@ public class ShootAndParkAutoPose8412Shoot126 extends CommandOpMode {
     );
 
     private Pose shootPose = new Pose(
-            72, 24, Math.toRadians(72 + 180)
+            84, 24, Math.toRadians(126 + 180)
     );
 
     private Pose parkMidPose = new Pose(
-            24, 48, 0 // control point heading is disregarded anyway
+            12, 48, 0 // control point heading is disregarded anyway
     );
 
     private Pose parkPose = new Pose(

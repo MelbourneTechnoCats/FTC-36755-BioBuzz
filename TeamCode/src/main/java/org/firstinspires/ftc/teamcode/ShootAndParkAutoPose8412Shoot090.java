@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.commands.ShootCommand;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.ShooterSubsystem;
 
-@Autonomous(name = "Shoot and Park")
+@Autonomous()
 public class ShootAndParkAutoPose8412Shoot090 extends CommandOpMode {
     private Follower follower;
     private ShooterSubsystem shooter;
