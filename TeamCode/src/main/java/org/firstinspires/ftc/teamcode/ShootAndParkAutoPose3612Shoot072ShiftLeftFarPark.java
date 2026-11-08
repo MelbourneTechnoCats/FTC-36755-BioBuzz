@@ -14,31 +14,31 @@ import org.firstinspires.ftc.teamcode.pedro.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.ShooterSubsystem;
 
 @Autonomous()
-public class ShootAndParkAutoPose8412Shoot090 extends CommandOpMode {
+public class ShootAndParkAutoPose3612Shoot072ShiftLeftFarPark extends CommandOpMode {
     private Follower follower;
     private ShooterSubsystem shooter;
 
     private Pose startingPose = new Pose(
-            84, 12, Math.toRadians(90)
+            36, 12, Math.toRadians(90)
     );
 
     private Pose shootPose = new Pose(
-            60, 18, Math.toRadians(90 + 180)
+            36, 24, Math.toRadians(60 + 180)
     );
 
     private Pose parkMidPose = new Pose(
-            24, 48, 0 // control point heading is disregarded anyway
+            36, 120, 0 // control point heading is disregarded anyway
     );
 
     private Pose parkPose = new Pose(
-            12, 96, Math.toRadians(0)
+            12, 120, Math.toRadians(0)
     );
 
     private Path shootPath;
     private Path parkPath;
 
-    private static final double SHOOT_SPEED = 1400;
-    private static final long SHOOT_TIME = 5000;
+    private static final double SHOOT_SPEED = 1200;
+    private static final long SHOOT_TIME = 10000;
 
     @Override
     public void initialize() {

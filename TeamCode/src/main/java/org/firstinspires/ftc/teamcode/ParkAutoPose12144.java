@@ -14,31 +14,23 @@ import org.firstinspires.ftc.teamcode.pedro.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.ShooterSubsystem;
 
 @Autonomous()
-public class ShootAndParkAutoPose8412Shoot126 extends CommandOpMode {
+public class ParkAutoPose12144 extends CommandOpMode {
     private Follower follower;
     private ShooterSubsystem shooter;
 
     private Pose startingPose = new Pose(
-            84, 12, Math.toRadians(90)
-    );
-
-    private Pose shootPose = new Pose(
-            84, 24, Math.toRadians(126 + 180)
-    );
-
-    private Pose parkMidPose = new Pose(
-            12, 48, 0 // control point heading is disregarded anyway
+            12, 144, Math.toRadians(270)
     );
 
     private Pose parkPose = new Pose(
-            12, 96, Math.toRadians(0)
+            14, 120, Math.toRadians(0)
     );
 
-    private Path shootPath;
+
+
+
     private Path parkPath;
 
-    private static final double SHOOT_SPEED = 1400;
-    private static final long SHOOT_TIME = 5000;
 
     @Override
     public void initialize() {
@@ -47,17 +39,10 @@ public class ShootAndParkAutoPose8412Shoot126 extends CommandOpMode {
         follower = Constants.createFollower(hardwareMap);
         follower.setPose(startingPose);
 
-        shooter = new ShooterSubsystem(hardwareMap, RobotConstants.LAUNCHER_MOTOR_NAME, RobotConstants.WINDMILL_SERVO_NAME);
-        register(shooter);
 
-        shootPath = Paths.line(startingPose, shootPose).linear(startingPose, shootPose);
-        parkPath = Paths.curve(shootPose, parkMidPose, parkPose).linear(shootPose, parkPose);
+        parkPath = Paths.curve(startingPose, parkPose).linear(startingPose, parkPose);
 
-        schedule(new SequentialCommandGroup(
-                new FollowPathCommand(follower, shootPath, true),
-                new ShootCommand(shooter, SHOOT_SPEED).withTimeout(SHOOT_TIME),
-                new FollowPathCommand(follower, parkPath, false)
-        ));
+        schedule(new FollowPathCommand(follower, parkPath, false));
     }
 
     @Override
