@@ -12,12 +12,14 @@ public class ShooterSubsystem extends SubsystemBase {
     private final Motor launcherMotor;
     private final CRServo windmillServo;
 
-    private final double kP = 35.0;
+    private final double kP = 35.0; // TODO: try 30.0
     private final double kI = 0.0;
     private final double kD = 0.0;
 
     private final double kS = 43.4433182;
     private final double kV = 1.077729822;
+
+    private static final double WINDMILL_SPEED = 0.3;
 
     private static final double ENCODER_RESOLUTION = 28; // counts per rotation
     private static final double MAX_RPM = 6000;
@@ -60,7 +62,7 @@ public class ShooterSubsystem extends SubsystemBase {
         launcherMotor.set(targetVelocity / MAX_TICKS_PER_SECOND);
 
         if (isTargetVelocityReached())
-            windmillServo.set(1);
+            windmillServo.set(WINDMILL_SPEED);
         else
             windmillServo.set(0);
     }

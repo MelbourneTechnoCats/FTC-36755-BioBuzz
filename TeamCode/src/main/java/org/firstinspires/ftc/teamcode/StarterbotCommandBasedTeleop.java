@@ -23,9 +23,9 @@ public class StarterbotCommandBasedTeleop extends CommandOpMode {
     private GamepadEx driverGamepad;
     private GamepadEx mechGamepad;
 
-    private double shooterSpeed = 1200; // in ticks per second
+    private double shooterSpeed = 1100; // in ticks per second
 
-    private final double SHOOTER_CHANGE_STEP = 50;
+    private final double SHOOTER_CHANGE_STEP = 25;
     private final double SHOOTER_MIN_SPEED = 1000;
 
     private boolean isFieldCentric = true;
