@@ -12,12 +12,12 @@ public class ShooterSubsystem extends SubsystemBase {
     private final Motor launcherMotor;
     private final CRServo windmillServo;
 
-    private final double kP = 4.0;
+    private final double kP = 35.0;
     private final double kI = 0.0;
     private final double kD = 0.0;
 
-    private final double kS = 73.41;
-    private final double kV = 1.073;
+    private final double kS = 43.4433182;
+    private final double kV = 1.077729822;
 
     private static final double ENCODER_RESOLUTION = 28; // counts per rotation
     private static final double MAX_RPM = 6000;
