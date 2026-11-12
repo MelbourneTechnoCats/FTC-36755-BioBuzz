@@ -12,7 +12,7 @@ public class ShooterSubsystem extends SubsystemBase {
     private final Motor launcherMotor;
     private final CRServo windmillServo;
 
-    private final double kP = 35.0; // TODO: try 30.0
+    private final double kP = 50.0;
     private final double kI = 0.0;
     private final double kD = 0.0;
 
@@ -24,7 +24,7 @@ public class ShooterSubsystem extends SubsystemBase {
     private static final double ENCODER_RESOLUTION = 28; // counts per rotation
     private static final double MAX_RPM = 6000;
 
-    private static final double WINDMILL_THRESHOLD = 0.95; // 95% target velocity minimum
+    private static final double WINDMILL_THRESHOLD = 50; // difference between target and actual velocity before we can run windmill
 
     public static final double MAX_TICKS_PER_SECOND = (MAX_RPM / 60) * ENCODER_RESOLUTION;
 
@@ -50,12 +50,13 @@ public class ShooterSubsystem extends SubsystemBase {
     private double targetVelocity = 0;
 
     public boolean isTargetVelocityReached() {
-        return (targetVelocity > 0 && getVelocity() > WINDMILL_THRESHOLD * targetVelocity);
+        return (targetVelocity > 0 && getVelocity() > targetVelocity - WINDMILL_THRESHOLD);
     }
 
     @Override
     public void periodic() {
         dashboardTelemetry.addData("Shooter Target Velocity", targetVelocity);
+        dashboardTelemetry.addData("Shooter Target Threshold", targetVelocity - WINDMILL_THRESHOLD);
         dashboardTelemetry.addData("Shooter Current Velocity", getVelocity());
         dashboardTelemetry.update();
 
