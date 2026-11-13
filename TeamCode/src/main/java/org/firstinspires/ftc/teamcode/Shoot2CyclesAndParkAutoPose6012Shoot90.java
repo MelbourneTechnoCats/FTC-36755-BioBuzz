@@ -27,7 +27,7 @@ public class Shoot2CyclesAndParkAutoPose6012Shoot90 extends CommandOpMode {
     );
 
     private Pose shootPose = new Pose(
-            60, 18, Math.toRadians(90 + 180)
+            60, 30, Math.toRadians(90 + 180)
     );
 
     private Pose intakeMidPose = new Pose(
@@ -39,7 +39,7 @@ public class Shoot2CyclesAndParkAutoPose6012Shoot90 extends CommandOpMode {
     );
 
     private Pose shootPose2 = new Pose(
-            60,18,Math.toRadians(270)
+            60,30,Math.toRadians(270)
     );
 
     private Pose parkMidPose = new Pose(
@@ -58,7 +58,7 @@ public class Shoot2CyclesAndParkAutoPose6012Shoot90 extends CommandOpMode {
     private Path parkPath;
 
     private static final double SHOOT_SPEED = 1100;
-    private static final long SHOOT_TIME = 4000;
+    private static final long SHOOT_TIME = 6000;
 
     private static final double INTAKE_POWER = 1;
 

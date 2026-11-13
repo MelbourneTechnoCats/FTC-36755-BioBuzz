@@ -19,7 +19,7 @@ public class ShooterSubsystem extends SubsystemBase {
     private final double kS = 43.4433182;
     private final double kV = 1.077729822;
 
-    private static final double WINDMILL_SPEED = 0.3;
+    private static final double WINDMILL_SPEED = 0.2;
 
     private static final double ENCODER_RESOLUTION = 28; // counts per rotation
     private static final double MAX_RPM = 6000;

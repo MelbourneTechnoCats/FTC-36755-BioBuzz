@@ -38,7 +38,7 @@ public class ShootAndParkAutoPose6012Shoot090 extends CommandOpMode {
     private Path parkPath;
 
     private static final double SHOOT_SPEED = 1100;
-    private static final long SHOOT_TIME = 5000;
+    private static final long SHOOT_TIME = 6000;
 
     @Override
     public void initialize() {

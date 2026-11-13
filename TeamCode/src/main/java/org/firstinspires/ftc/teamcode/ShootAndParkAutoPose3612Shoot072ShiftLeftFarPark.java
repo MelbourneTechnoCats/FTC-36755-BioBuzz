@@ -23,7 +23,7 @@ public class ShootAndParkAutoPose3612Shoot072ShiftLeftFarPark extends CommandOpM
     );
 
     private Pose shootPose = new Pose(
-            36, 24, Math.toRadians(60 + 180)
+            36, 30, Math.toRadians(60 + 180)
     );
 
     private Pose parkMidPose = new Pose(

@@ -23,7 +23,7 @@ public class ShootAndParkAutoPose3612Shoot072 extends CommandOpMode {
     );
 
     private Pose shootPose = new Pose(
-            48, 24, Math.toRadians(65 + 180)
+            48, 30, Math.toRadians(65 + 180)
     );
 
     private Pose parkMidPose = new Pose(
@@ -38,7 +38,7 @@ public class ShootAndParkAutoPose3612Shoot072 extends CommandOpMode {
     private Path parkPath;
 
     private static final double SHOOT_SPEED = 1200;
-    private static final long SHOOT_TIME = 5000;
+    private static final long SHOOT_TIME = 6000;
 
     @Override
     public void initialize() {
