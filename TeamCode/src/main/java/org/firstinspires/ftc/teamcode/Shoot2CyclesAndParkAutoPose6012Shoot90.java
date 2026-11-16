@@ -47,7 +47,7 @@ public class Shoot2CyclesAndParkAutoPose6012Shoot90 extends CommandOpMode {
     );
 
     private Pose parkPose = new Pose(
-            12, 96, Math.toRadians(0)
+            13, 96, Math.toRadians(0)
     );
 
     private Path shootPath;
