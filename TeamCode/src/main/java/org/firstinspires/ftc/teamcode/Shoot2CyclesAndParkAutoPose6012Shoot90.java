@@ -74,7 +74,7 @@ public class Shoot2CyclesAndParkAutoPose6012Shoot90 extends CommandOpMode {
         shooter = new ShooterSubsystem(hardwareMap, RobotConstants.LAUNCHER_MOTOR_NAME, RobotConstants.WINDMILL_SERVO_NAME);
         register(shooter);
 
-        intake = new IntakeSubsystem(hardwareMap, RobotConstants.INTAKE_MOTOR_NAME, RobotConstants.LEFT_INTAKE_SERVO_NAME, RobotConstants.RIGHT_INTAKE_SERVO_NAME);
+        intake = new IntakeSubsystem(hardwareMap);
         register(intake);
 
         shootPath = Paths.line(startingPose, shootPose).linear(startingPose, shootPose);

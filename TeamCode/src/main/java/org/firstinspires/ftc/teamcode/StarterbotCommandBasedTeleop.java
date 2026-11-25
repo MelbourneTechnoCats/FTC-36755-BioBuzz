@@ -40,11 +40,7 @@ public class StarterbotCommandBasedTeleop extends CommandOpMode {
         );
         register(drive); // must be done before setting default command!
 
-        intake = new IntakeSubsystem(
-                hardwareMap,
-                RobotConstants.INTAKE_MOTOR_NAME,
-                RobotConstants.LEFT_INTAKE_SERVO_NAME, RobotConstants.RIGHT_INTAKE_SERVO_NAME
-        );
+        intake = new IntakeSubsystem(hardwareMap);
         register(intake);
 
         shooter = new ShooterSubsystem(
