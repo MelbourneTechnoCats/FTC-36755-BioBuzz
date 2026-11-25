@@ -1,0 +1,174 @@
+package org.firstinspires.ftc.teamcode;
+
+import com.pedropathing.api.Paths;
+import com.pedropathing.follower.Follower;
+import com.pedropathing.math.Pose;
+import com.pedropathing.paths.Path;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.seattlesolvers.solverslib.command.Command;
+import com.seattlesolvers.solverslib.command.CommandOpMode;
+import com.seattlesolvers.solverslib.command.ConditionalCommand;
+import com.seattlesolvers.solverslib.command.ParallelCommandGroup;
+import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
+import com.seattlesolvers.solverslib.command.WaitUntilCommand;
+import com.seattlesolvers.solverslib.pedroCommand.FollowPathCommand;
+
+import org.firstinspires.ftc.teamcode.commands.IntakeCommand;
+import org.firstinspires.ftc.teamcode.commands.ShootCommand;
+import org.firstinspires.ftc.teamcode.pedro.Constants;
+import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.LimelightSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.ShooterSubsystem;
+
+import java.util.Arrays;
+
+@Autonomous
+public class Shoot2CyclesAndParkAutoGeneral extends CommandOpMode {
+    private Follower follower;
+    private ShooterSubsystem shooter;
+    private IntakeSubsystem intake;
+
+    private LimelightSubsystem limelight;
+
+    private Pose startingPose = new Pose(
+            60, 12, Math.toRadians(270)
+    );
+
+    private Pose shootPoseClose = new Pose(
+            60, 30, Math.toRadians(90 + 180)
+    );
+
+    private Pose intakeMidPose = new Pose(
+            11, 64, Math.toRadians(90 + 180)
+    );
+
+    private Pose intakePose = new Pose(
+            11,13,Math.toRadians(270)
+    );
+
+    private Pose intakeToShootCloseMidPose = new Pose(
+            24,20, Math.toRadians(90)
+    );
+
+    private Pose intakeToShootFarMidPose = new Pose(
+            36,144-30+5, Math.toRadians(90)
+    );
+
+    private Pose shootPoseFar = new Pose(
+            60,144-30+5,Math.toRadians(90)
+    );
+
+    private Pose shootFarToParkMidPose = new Pose(
+            36, 144-30+5, 0 // control point heading is disregarded anyway
+    );
+
+    private Pose shootCloseToParkMidPose = new Pose(
+            24, 48, 0 // control point heading is disregarded anyway
+    );
+
+
+    private Pose parkPoseFar = new Pose(
+            13, 120, Math.toRadians(0)
+    );
+
+    private Pose parkPoseClose = new Pose(
+            13, 96, Math.toRadians(0)
+    );
+
+    private Path shootPath;
+
+    private Path intakePath;
+
+    private Path shootPathTip;
+
+    private Path shootPathNoTip;
+    private Path parkPathTip;
+
+    private Path parkPathNoTip;
+
+    private static final double SHOOT_SPEED = 1100;
+    private static final long SHOOT_TIME = 6000;
+
+    private static final double INTAKE_POWER = 1;
+
+    private static final long INTAKE_MAX_TIME = 5000;
+
+    private static final long TAG_WAIT_TIME = 5000;
+
+    @Override
+    public void initialize() {
+        reset();
+
+        follower = Constants.createFollower(hardwareMap);
+        follower.setPose(startingPose);
+
+        shooter = new ShooterSubsystem(hardwareMap, RobotConstants.LAUNCHER_MOTOR_NAME, RobotConstants.WINDMILL_SERVO_NAME);
+        register(shooter);
+
+        intake = new IntakeSubsystem(hardwareMap);
+        register(intake);
+
+        limelight = new LimelightSubsystem(hardwareMap);
+        register(limelight);
+
+        shootPath = Paths.line(startingPose, shootPoseClose).linear(startingPose, shootPoseClose);
+        intakePath = Paths.curve(shootPoseClose,intakeMidPose,intakePose).linear(shootPoseClose,intakePose);
+        shootPathTip = Paths.curve(intakePose,intakeToShootFarMidPose,shootPoseFar).linear(intakePose,shootPoseFar);
+        shootPathNoTip = Paths.curve(intakePose,intakeToShootCloseMidPose,shootPoseClose).linear(intakePose,shootPoseClose);
+        parkPathTip = Paths.curve(shootPoseFar, shootFarToParkMidPose, parkPoseFar).linear(shootPoseFar, parkPoseFar);
+        parkPathNoTip = Paths.curve(shootPoseClose, shootCloseToParkMidPose, parkPoseClose).linear(shootPoseClose, parkPoseClose);
+
+        Command gardenIntakeCommand =
+                new ParallelCommandGroup(
+                new FollowPathCommand(follower, intakePath,true),
+                new IntakeCommand(intake,INTAKE_POWER)
+            ).withTimeout(INTAKE_MAX_TIME);
+
+        Command shootParkTipCommand =
+                new SequentialCommandGroup(
+                    new FollowPathCommand(follower,shootPathTip,true),
+                    new ShootCommand(shooter,SHOOT_SPEED).withTimeout(SHOOT_TIME),
+                    new FollowPathCommand(follower, parkPathTip, false));
+
+        Command shootParkNoTipCommand =
+                new SequentialCommandGroup(
+                        new FollowPathCommand(follower,shootPathNoTip,true),
+                        new ShootCommand(shooter,SHOOT_SPEED).withTimeout(SHOOT_TIME),
+                        new FollowPathCommand(follower, parkPathNoTip, false));
+
+
+        schedule(new SequentialCommandGroup(
+                new FollowPathCommand(follower, shootPath, true),
+                new ShootCommand(shooter, SHOOT_SPEED).withTimeout(SHOOT_TIME),
+                new WaitUntilCommand(
+                        () -> !limelight.isTagVisible(Arrays.asList(30,31,32,33))
+                ).withTimeout(TAG_WAIT_TIME),
+                new ConditionalCommand(
+                        new SequentialCommandGroup(
+                                gardenIntakeCommand,
+                                shootParkTipCommand
+
+                        ),
+                        new SequentialCommandGroup(
+                                gardenIntakeCommand,
+                                shootParkNoTipCommand
+                        ),() -> !limelight.isTagVisible(Arrays.asList(30,31,32,33))
+                )
+
+
+        ));
+    }
+
+    @Override
+    public void run() {
+        super.run();
+
+        follower.update(); // REQUIRED FOR DRIVETRAIN TO RUN!!!!
+
+        // publish robot position data
+        Pose pose = follower.pose();
+        telemetry.addData("Pose", "heading: %.2f deg, X: %.2f in, Y: %.2f in", Math.toDegrees(pose.heading()), pose.x(), pose.y());
+
+        telemetry.update();
+    }
+}
