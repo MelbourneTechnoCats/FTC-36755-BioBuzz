@@ -146,15 +146,16 @@ public class Shoot2CyclesAndParkAutoGeneral extends CommandOpMode {
 
     }
 
+    private Command getGardenIntakeCommand() {
+        return new ParallelCommandGroup(
+                new FollowPathCommand(follower, intakePath,true),
+                new IntakeCommand(intake,INTAKE_POWER)
+        ).withTimeout(INTAKE_MAX_TIME);
+    }
+
     @Override
     public void preRun() {
         // NOTE: this is run the moment Play is pressed
-
-        Command gardenIntakeCommand =
-                new ParallelCommandGroup(
-                        new FollowPathCommand(follower, intakePath,true),
-                        new IntakeCommand(intake,INTAKE_POWER)
-                ).withTimeout(INTAKE_MAX_TIME);
 
         Command shootParkTipCommand =
                 new SequentialCommandGroup(
@@ -178,12 +179,12 @@ public class Shoot2CyclesAndParkAutoGeneral extends CommandOpMode {
                 ).withTimeout(TAG_WAIT_TIME),
                 new ConditionalCommand(
                         new SequentialCommandGroup(
-                                gardenIntakeCommand,
+                                getGardenIntakeCommand(),
                                 shootParkTipCommand
 
                         ),
                         new SequentialCommandGroup(
-                                gardenIntakeCommand,
+                                getGardenIntakeCommand(),
                                 shootParkNoTipCommand
                         ),() -> !limelight.isTagVisible(startTagIds)
                 )
