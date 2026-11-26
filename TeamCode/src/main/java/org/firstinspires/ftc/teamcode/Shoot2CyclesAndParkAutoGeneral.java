@@ -11,6 +11,8 @@ import com.seattlesolvers.solverslib.command.ConditionalCommand;
 import com.seattlesolvers.solverslib.command.ParallelCommandGroup;
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
 import com.seattlesolvers.solverslib.command.WaitUntilCommand;
+import com.seattlesolvers.solverslib.gamepad.GamepadEx;
+import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 import com.seattlesolvers.solverslib.pedroCommand.FollowPathCommand;
 
 import org.firstinspires.ftc.teamcode.commands.IntakeCommand;
@@ -21,9 +23,13 @@ import org.firstinspires.ftc.teamcode.subsystems.LimelightSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ShooterSubsystem;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Autonomous
 public class Shoot2CyclesAndParkAutoGeneral extends CommandOpMode {
+
+    private GamepadEx driverGamepad;
+
     private Follower follower;
     private ShooterSubsystem shooter;
     private IntakeSubsystem intake;
@@ -99,6 +105,8 @@ public class Shoot2CyclesAndParkAutoGeneral extends CommandOpMode {
     public void initialize() {
         reset();
 
+        driverGamepad = new GamepadEx(gamepad1);
+
         follower = Constants.createFollower(hardwareMap);
         follower.setPose(startingPose);
 
@@ -119,11 +127,22 @@ public class Shoot2CyclesAndParkAutoGeneral extends CommandOpMode {
         parkPathNoTip = Paths.curve(shootPoseClose, shootCloseToParkMidPose, parkPoseClose).linear(shootPoseClose, parkPoseClose);
     }
 
+    private Alliance alliance = Alliance.BLUE;
+
     @Override
     public void initialize_loop() {
         // TODO: things to run after initialize(), while the robot is still in Init (think auto config)
         // NOTE: if we're doing auto config here then we'll have to store it in a class member to pass it to preRun()
 
+        driverGamepad.readButtons();
+
+        if(driverGamepad.wasJustPressed(GamepadKeys.Button.CIRCLE)){
+
+            alliance = (alliance == Alliance.BLUE) ? Alliance.RED : Alliance.BLUE;
+        }
+
+        telemetry.addData("Alliance is (Press Circle to switch)", alliance);
+        telemetry.update();
 
     }
 
@@ -149,11 +168,13 @@ public class Shoot2CyclesAndParkAutoGeneral extends CommandOpMode {
                         new ShootCommand(shooter,SHOOT_SPEED).withTimeout(SHOOT_TIME),
                         new FollowPathCommand(follower, parkPathNoTip, false));
 
+        List<Integer> startTagIds = (alliance == Alliance.BLUE) ? LimelightSubsystem.BLUE_CLOSE_IDS : LimelightSubsystem.RED_CLOSE_IDS;
+
         schedule(new SequentialCommandGroup(
                 new FollowPathCommand(follower, shootPath, true),
                 new ShootCommand(shooter, SHOOT_SPEED).withTimeout(SHOOT_TIME),
                 new WaitUntilCommand(
-                        () -> !limelight.isTagVisible(LimelightSubsystem.RED_CLOSE_IDS)
+                        () -> !limelight.isTagVisible(startTagIds)
                 ).withTimeout(TAG_WAIT_TIME),
                 new ConditionalCommand(
                         new SequentialCommandGroup(
@@ -164,7 +185,7 @@ public class Shoot2CyclesAndParkAutoGeneral extends CommandOpMode {
                         new SequentialCommandGroup(
                                 gardenIntakeCommand,
                                 shootParkNoTipCommand
-                        ),() -> !limelight.isTagVisible(LimelightSubsystem.RED_CLOSE_IDS)
+                        ),() -> !limelight.isTagVisible(startTagIds)
                 )
         ));
     }
