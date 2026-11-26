@@ -136,12 +136,11 @@ public class Shoot2CyclesAndParkAutoGeneral extends CommandOpMode {
                         new ShootCommand(shooter,SHOOT_SPEED).withTimeout(SHOOT_TIME),
                         new FollowPathCommand(follower, parkPathNoTip, false));
 
-
         schedule(new SequentialCommandGroup(
                 new FollowPathCommand(follower, shootPath, true),
                 new ShootCommand(shooter, SHOOT_SPEED).withTimeout(SHOOT_TIME),
                 new WaitUntilCommand(
-                        () -> !limelight.isTagVisible(Arrays.asList(30,31,32,33))
+                        () -> !limelight.isTagVisible(LimelightSubsystem.RED_CLOSE_IDS)
                 ).withTimeout(TAG_WAIT_TIME),
                 new ConditionalCommand(
                         new SequentialCommandGroup(
@@ -152,10 +151,8 @@ public class Shoot2CyclesAndParkAutoGeneral extends CommandOpMode {
                         new SequentialCommandGroup(
                                 gardenIntakeCommand,
                                 shootParkNoTipCommand
-                        ),() -> !limelight.isTagVisible(Arrays.asList(30,31,32,33))
+                        ),() -> !limelight.isTagVisible(LimelightSubsystem.RED_CLOSE_IDS)
                 )
-
-
         ));
     }
 

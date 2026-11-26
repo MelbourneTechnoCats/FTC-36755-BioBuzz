@@ -14,6 +14,13 @@ import java.util.Arrays;
 import java.util.List;
 
 public class LimelightSubsystem extends SubsystemBase {
+    public static final List<Integer> RED_FAR_IDS = Arrays.asList(30, 31, 32, 33);
+    public static final List<Integer> RED_CLOSE_IDS = Arrays.asList(34, 35, 36, 37);
+    public static final List<Integer> RED_IDS = Arrays.asList(30, 31, 32, 33, 34, 35, 36, 37);
+    public static final List<Integer> BLUE_FAR_IDS = Arrays.asList(38, 39, 40, 41);
+    public static final List<Integer> BLUE_CLOSE_IDS = Arrays.asList(42, 43, 44, 45);
+    public static final List<Integer> BLUE_IDS = Arrays.asList(38, 39, 40, 41, 42, 43, 44, 45);
+
     private Limelight3A limelight;
 
     public LimelightSubsystem(HardwareMap hardwareMap) {
