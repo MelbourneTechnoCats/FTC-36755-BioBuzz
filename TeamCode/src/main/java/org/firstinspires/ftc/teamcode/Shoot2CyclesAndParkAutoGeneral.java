@@ -117,18 +117,31 @@ public class Shoot2CyclesAndParkAutoGeneral extends CommandOpMode {
         shootPathNoTip = Paths.curve(intakePose,intakeToShootCloseMidPose,shootPoseClose).linear(intakePose,shootPoseClose);
         parkPathTip = Paths.curve(shootPoseFar, shootFarToParkMidPose, parkPoseFar).linear(shootPoseFar, parkPoseFar);
         parkPathNoTip = Paths.curve(shootPoseClose, shootCloseToParkMidPose, parkPoseClose).linear(shootPoseClose, parkPoseClose);
+    }
+
+    @Override
+    public void initialize_loop() {
+        // TODO: things to run after initialize(), while the robot is still in Init (think auto config)
+        // NOTE: if we're doing auto config here then we'll have to store it in a class member to pass it to preRun()
+
+
+    }
+
+    @Override
+    public void preRun() {
+        // NOTE: this is run the moment Play is pressed
 
         Command gardenIntakeCommand =
                 new ParallelCommandGroup(
-                new FollowPathCommand(follower, intakePath,true),
-                new IntakeCommand(intake,INTAKE_POWER)
-            ).withTimeout(INTAKE_MAX_TIME);
+                        new FollowPathCommand(follower, intakePath,true),
+                        new IntakeCommand(intake,INTAKE_POWER)
+                ).withTimeout(INTAKE_MAX_TIME);
 
         Command shootParkTipCommand =
                 new SequentialCommandGroup(
-                    new FollowPathCommand(follower,shootPathTip,true),
-                    new ShootCommand(shooter,SHOOT_SPEED).withTimeout(SHOOT_TIME),
-                    new FollowPathCommand(follower, parkPathTip, false));
+                        new FollowPathCommand(follower,shootPathTip,true),
+                        new ShootCommand(shooter,SHOOT_SPEED).withTimeout(SHOOT_TIME),
+                        new FollowPathCommand(follower, parkPathTip, false));
 
         Command shootParkNoTipCommand =
                 new SequentialCommandGroup(
