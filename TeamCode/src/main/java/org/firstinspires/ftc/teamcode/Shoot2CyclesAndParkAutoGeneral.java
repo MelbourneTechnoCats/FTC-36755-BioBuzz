@@ -22,7 +22,6 @@ import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.LimelightSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ShooterSubsystem;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Autonomous
@@ -65,19 +64,14 @@ public class Shoot2CyclesAndParkAutoGeneral extends CommandOpMode {
     );
 
     private Pose shootFarToParkMidPose = new Pose(
-            36, 144-30+5, 0 // control point heading is disregarded anyway
+            36, 110, 0 // control point heading is disregarded anyway
     );
 
     private Pose shootCloseToParkMidPose = new Pose(
             24, 48, 0 // control point heading is disregarded anyway
     );
 
-
-    private Pose parkPoseFar = new Pose(
-            13, 120, Math.toRadians(0)
-    );
-
-    private Pose parkPoseClose = new Pose(
+    private Pose parkPose = new Pose(
             13, 96, Math.toRadians(0)
     );
 
@@ -101,6 +95,7 @@ public class Shoot2CyclesAndParkAutoGeneral extends CommandOpMode {
 
     private static final long TAG_WAIT_TIME = 5000;
 
+
     @Override
     public void initialize() {
         reset();
@@ -123,11 +118,13 @@ public class Shoot2CyclesAndParkAutoGeneral extends CommandOpMode {
         intakePath = Paths.curve(shootPoseClose,intakeMidPose,intakePose).linear(shootPoseClose,intakePose);
         shootPathTip = Paths.curve(intakePose,intakeToShootFarMidPose,shootPoseFar).linear(intakePose,shootPoseFar);
         shootPathNoTip = Paths.curve(intakePose,intakeToShootCloseMidPose,shootPoseClose).linear(intakePose,shootPoseClose);
-        parkPathTip = Paths.curve(shootPoseFar, shootFarToParkMidPose, parkPoseFar).linear(shootPoseFar, parkPoseFar);
-        parkPathNoTip = Paths.curve(shootPoseClose, shootCloseToParkMidPose, parkPoseClose).linear(shootPoseClose, parkPoseClose);
+        parkPathTip = Paths.curve(shootPoseFar, shootFarToParkMidPose, parkPose).linear(shootPoseFar, parkPose);
+        parkPathNoTip = Paths.curve(shootPoseClose, shootCloseToParkMidPose, parkPose).linear(shootPoseClose, parkPose);
     }
 
     private Alliance alliance = Alliance.BLUE;
+
+    private ParkSide parkSide = ParkSide.CLOSE;
 
     @Override
     public void initialize_loop() {
@@ -141,7 +138,15 @@ public class Shoot2CyclesAndParkAutoGeneral extends CommandOpMode {
             alliance = (alliance == Alliance.BLUE) ? Alliance.RED : Alliance.BLUE;
         }
 
+        if(driverGamepad.wasJustPressed(GamepadKeys.Button.TRIANGLE)){
+
+            parkSide = (parkSide == ParkSide.CLOSE) ? ParkSide.FAR : ParkSide.CLOSE;
+        }
+
         telemetry.addData("Alliance is (Press Circle to switch)", alliance);
+        telemetry.update();
+
+        telemetry.addData("Park-side is (Press Triangle to switch)", parkSide);
         telemetry.update();
 
     }
@@ -169,6 +174,7 @@ public class Shoot2CyclesAndParkAutoGeneral extends CommandOpMode {
                         new FollowPathCommand(follower, parkPathNoTip, false));
 
         List<Integer> startTagIds = (alliance == Alliance.BLUE) ? LimelightSubsystem.BLUE_CLOSE_IDS : LimelightSubsystem.RED_CLOSE_IDS;
+        Pose parkPose = (parkSide == ParkSide.CLOSE) ? new Pose(13, 96, 0) : new Pose (13, 120, 0);
 
         schedule(new SequentialCommandGroup(
                 new FollowPathCommand(follower, shootPath, true),
