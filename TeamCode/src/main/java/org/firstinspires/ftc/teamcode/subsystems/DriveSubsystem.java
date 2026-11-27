@@ -63,6 +63,13 @@ public class DriveSubsystem extends SubsystemBase {
         drive.driveRobotCentric(strafe, forward, rotate);
     }
 
+    public void setPose(Pose2d pose) {
+        pinpoint.setPosition(new Pose2D(
+                DistanceUnit.INCH, pose.getX(), pose.getY(),
+                AngleUnit.RADIANS, pose.getHeading()
+        ));
+    }
+
     public Pose2d getPose() {
         pinpoint.update();
         Pose2D pose = pinpoint.getPosition();

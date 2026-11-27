@@ -39,6 +39,7 @@ public class StarterbotCommandBasedTeleop extends CommandOpMode {
                 RobotConstants.PINPOINT_NAME
         );
         register(drive); // must be done before setting default command!
+        drive.setPose(RobotState.robotPose);
 
         intake = new IntakeSubsystem(hardwareMap);
         register(intake);

@@ -13,6 +13,7 @@ import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
 import com.seattlesolvers.solverslib.command.WaitUntilCommand;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
+import com.seattlesolvers.solverslib.geometry.Pose2d;
 import com.seattlesolvers.solverslib.pedroCommand.FollowPathCommand;
 import com.seattlesolvers.solverslib.util.Timing;
 
@@ -67,7 +68,11 @@ public class Shoot2CyclesAndParkAutoGeneral extends CommandOpMode {
     );
 
     private Pose shootCloseToParkMidPose = new Pose(
-            24, 48, 0 // control point heading is disregarded anyway
+            10, 48, 0 // control point heading is disregarded anyway
+    );
+
+    private Pose shootCloseToParkFarMidPose2 = new Pose(
+            36, 119,0
     );
 
     private Path shootPath;
@@ -100,6 +105,9 @@ public class Shoot2CyclesAndParkAutoGeneral extends CommandOpMode {
 
         follower = Constants.createFollower(hardwareMap);
         follower.setPose(startingPose);
+        RobotState.robotPose = new Pose2d(
+                startingPose.x(), startingPose.y(), startingPose.heading()
+        );
 
         shooter = new ShooterSubsystem(hardwareMap, RobotConstants.LAUNCHER_MOTOR_NAME, RobotConstants.WINDMILL_SERVO_NAME);
         register(shooter);
@@ -138,8 +146,6 @@ public class Shoot2CyclesAndParkAutoGeneral extends CommandOpMode {
         }
 
         telemetry.addData("Alliance is (Press Circle to switch)", alliance);
-        telemetry.update();
-
         telemetry.addData("Park-side is (Press Triangle to switch)", parkSide);
         telemetry.update();
 
@@ -159,7 +165,12 @@ public class Shoot2CyclesAndParkAutoGeneral extends CommandOpMode {
 
         Pose parkPose = (parkSide == ParkSide.CLOSE) ? new Pose(13, 96, 0) : new Pose (13, 120, 0);
         parkPathTip = Paths.curve(shootPoseFar, shootFarToParkMidPose, parkPose).linear(shootPoseFar, parkPose);
-        parkPathNoTip = Paths.curve(shootPoseClose, shootCloseToParkMidPose, parkPose).linear(shootPoseClose, parkPose);
+        if (parkSide == ParkSide.CLOSE) {
+            parkPathNoTip = Paths.curve(shootPoseClose, shootCloseToParkMidPose, parkPose).linear(shootPoseClose, parkPose);
+        } else {
+            parkPathNoTip = Paths.curve(shootPoseClose, shootCloseToParkMidPose, shootCloseToParkFarMidPose2, parkPose).linear(shootPoseClose, parkPose);
+        }
+
 
         schedule(new SequentialCommandGroup(
                 new FollowPathCommand(follower, shootPath, true),
@@ -194,6 +205,9 @@ public class Shoot2CyclesAndParkAutoGeneral extends CommandOpMode {
         Pose pose = follower.pose();
         telemetry.addData("Pose", "heading: %.2f deg, X: %.2f in, Y: %.2f in", Math.toDegrees(pose.heading()), pose.x(), pose.y());
         telemetry.addData("Tag visible", limelight.isTagVisible((alliance == Alliance.BLUE) ? LimelightSubsystem.BLUE_CLOSE_IDS : LimelightSubsystem.RED_CLOSE_IDS));
+        RobotState.robotPose = new Pose2d(
+                pose.x(), pose.y(), pose.heading()
+        );
 
         telemetry.update();
     }
