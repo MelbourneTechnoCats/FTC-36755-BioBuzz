@@ -25,6 +25,7 @@ public class LimelightSubsystem extends SubsystemBase {
 
     public LimelightSubsystem(HardwareMap hardwareMap) {
         limelight = hardwareMap.get(Limelight3A.class, RobotConstants.LIMELIGHT_NAME);
+        limelight.setPollRateHz(100);
         limelight.pipelineSwitch(0);
         limelight.start();
     }

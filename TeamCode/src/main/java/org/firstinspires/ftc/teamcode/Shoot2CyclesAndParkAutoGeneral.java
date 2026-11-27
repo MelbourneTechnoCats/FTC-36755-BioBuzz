@@ -14,6 +14,7 @@ import com.seattlesolvers.solverslib.command.WaitUntilCommand;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 import com.seattlesolvers.solverslib.pedroCommand.FollowPathCommand;
+import com.seattlesolvers.solverslib.util.Timing;
 
 import org.firstinspires.ftc.teamcode.commands.IntakeCommand;
 import org.firstinspires.ftc.teamcode.commands.ShootCommand;
@@ -51,13 +52,11 @@ public class Shoot2CyclesAndParkAutoGeneral extends CommandOpMode {
             11,13,Math.toRadians(270)
     );
 
-    private Pose intakeToShootCloseMidPose = new Pose(
-            24,20, Math.toRadians(90)
+
+    private Pose shootPoseClosetoShootPoseFarMidPose = new Pose (
+            -18,60,0
     );
 
-    private Pose intakeToShootFarMidPose = new Pose(
-            36,144-30+5, Math.toRadians(90)
-    );
 
     private Pose shootPoseFar = new Pose(
             60,144-30+5,Math.toRadians(90)
@@ -81,10 +80,11 @@ public class Shoot2CyclesAndParkAutoGeneral extends CommandOpMode {
 
     private Path shootPathTip;
 
-    private Path shootPathNoTip;
     private Path parkPathTip;
 
     private Path parkPathNoTip;
+
+    private Path gardenToScanPath;
 
     private static final double SHOOT_SPEED = 1100;
     private static final long SHOOT_TIME = 6000;
@@ -93,7 +93,7 @@ public class Shoot2CyclesAndParkAutoGeneral extends CommandOpMode {
 
     private static final long INTAKE_MAX_TIME = 5000;
 
-    private static final long TAG_WAIT_TIME = 5000;
+    private static final long TAG_WAIT_TIME = 1000;
 
 
     @Override
@@ -116,8 +116,8 @@ public class Shoot2CyclesAndParkAutoGeneral extends CommandOpMode {
 
         shootPath = Paths.line(startingPose, shootPoseClose).linear(startingPose, shootPoseClose);
         intakePath = Paths.curve(shootPoseClose,intakeMidPose,intakePose).linear(shootPoseClose,intakePose);
-        shootPathTip = Paths.curve(intakePose,intakeToShootFarMidPose,shootPoseFar).linear(intakePose,shootPoseFar);
-        shootPathNoTip = Paths.curve(intakePose,intakeToShootCloseMidPose,shootPoseClose).linear(intakePose,shootPoseClose);
+        gardenToScanPath = Paths.line(intakePose,shootPoseClose).linear(intakePose,shootPoseClose);
+        shootPathTip = Paths.curve(shootPoseClose,shootPoseClosetoShootPoseFarMidPose,shootPoseFar).linear(shootPoseClose,shootPoseFar);
         parkPathTip = Paths.curve(shootPoseFar, shootFarToParkMidPose, parkPose).linear(shootPoseFar, parkPose);
         parkPathNoTip = Paths.curve(shootPoseClose, shootCloseToParkMidPose, parkPose).linear(shootPoseClose, parkPose);
     }
@@ -151,28 +151,15 @@ public class Shoot2CyclesAndParkAutoGeneral extends CommandOpMode {
 
     }
 
-    private Command getGardenIntakeCommand() {
-        return new ParallelCommandGroup(
-                new FollowPathCommand(follower, intakePath,true),
-                new IntakeCommand(intake,INTAKE_POWER)
-        ).withTimeout(INTAKE_MAX_TIME);
-    }
-
     @Override
     public void preRun() {
         // NOTE: this is run the moment Play is pressed
 
-        Command shootParkTipCommand =
-                new SequentialCommandGroup(
-                        new FollowPathCommand(follower,shootPathTip,true),
-                        new ShootCommand(shooter,SHOOT_SPEED).withTimeout(SHOOT_TIME),
-                        new FollowPathCommand(follower, parkPathTip, false));
-
-        Command shootParkNoTipCommand =
-                new SequentialCommandGroup(
-                        new FollowPathCommand(follower,shootPathNoTip,true),
-                        new ShootCommand(shooter,SHOOT_SPEED).withTimeout(SHOOT_TIME),
-                        new FollowPathCommand(follower, parkPathNoTip, false));
+        Command gardenIntakeCommand =
+                new ParallelCommandGroup(
+                        new FollowPathCommand(follower, intakePath,true),
+                        new IntakeCommand(intake,INTAKE_POWER)
+                ).withTimeout(INTAKE_MAX_TIME);
 
         List<Integer> startTagIds = (alliance == Alliance.BLUE) ? LimelightSubsystem.BLUE_CLOSE_IDS : LimelightSubsystem.RED_CLOSE_IDS;
         Pose parkPose = (parkSide == ParkSide.CLOSE) ? new Pose(13, 96, 0) : new Pose (13, 120, 0);
@@ -180,18 +167,21 @@ public class Shoot2CyclesAndParkAutoGeneral extends CommandOpMode {
         schedule(new SequentialCommandGroup(
                 new FollowPathCommand(follower, shootPath, true),
                 new ShootCommand(shooter, SHOOT_SPEED).withTimeout(SHOOT_TIME),
+                gardenIntakeCommand,
+                new FollowPathCommand(follower,gardenToScanPath),
                 new WaitUntilCommand(
-                        () -> !limelight.isTagVisible(startTagIds)
+                        () -> limelight.isTagVisible(startTagIds)
                 ).withTimeout(TAG_WAIT_TIME),
                 new ConditionalCommand(
                         new SequentialCommandGroup(
-                                getGardenIntakeCommand(),
-                                shootParkTipCommand
+                                new FollowPathCommand(follower, shootPathTip),
+                                new ShootCommand(shooter, SHOOT_SPEED).withTimeout(SHOOT_TIME),
+                                new FollowPathCommand(follower, parkPathTip)
 
                         ),
                         new SequentialCommandGroup(
-                                getGardenIntakeCommand(),
-                                shootParkNoTipCommand
+                                new ShootCommand(shooter, SHOOT_SPEED).withTimeout(SHOOT_TIME),
+                                new FollowPathCommand(follower, parkPathNoTip)
                         ),() -> !limelight.isTagVisible(startTagIds)
                 )
         ));
@@ -206,6 +196,7 @@ public class Shoot2CyclesAndParkAutoGeneral extends CommandOpMode {
         // publish robot position data
         Pose pose = follower.pose();
         telemetry.addData("Pose", "heading: %.2f deg, X: %.2f in, Y: %.2f in", Math.toDegrees(pose.heading()), pose.x(), pose.y());
+        telemetry.addData("Tag visible", limelight.isTagVisible((alliance == Alliance.BLUE) ? LimelightSubsystem.BLUE_CLOSE_IDS : LimelightSubsystem.RED_CLOSE_IDS));
 
         telemetry.update();
     }
