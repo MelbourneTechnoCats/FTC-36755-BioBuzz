@@ -93,6 +93,7 @@ public class Shoot2CyclesAndParkAutoGeneral extends CommandOpMode {
 
     private static final long TAG_WAIT_TIME = 1000;
 
+    private static final boolean LIMELIGHT_FALLBACK_TAG_VISIBILITY = true; // only used if Limelight is dead
 
     @Override
     public void initialize() {
@@ -104,14 +105,27 @@ public class Shoot2CyclesAndParkAutoGeneral extends CommandOpMode {
         follower.setPose(startingPose);
         RobotState.updateRobotPose(startingPose); // initialise robot pose to starting pose from auto - in case we do not proceed with starting
 
-        shooter = new ShooterSubsystem(hardwareMap, RobotConstants.LAUNCHER_MOTOR_NAME, RobotConstants.WINDMILL_SERVO_NAME);
-        register(shooter);
+        try{
+            shooter = new ShooterSubsystem(hardwareMap, RobotConstants.LAUNCHER_MOTOR_NAME, RobotConstants.WINDMILL_SERVO_NAME);
+            register(shooter);
+        } catch (Exception e) {
 
-        intake = new IntakeSubsystem(hardwareMap);
-        register(intake);
+        }
 
-        limelight = new LimelightSubsystem(hardwareMap);
-        register(limelight);
+
+        try{
+            intake = new IntakeSubsystem(hardwareMap);
+            register(intake);
+        } catch (Exception e) {
+
+        }
+
+        try{
+            limelight = new LimelightSubsystem(hardwareMap);
+            register(limelight);
+        } catch (Exception e) {
+
+        }
 
         shootPath = Paths.line(startingPose, shootPoseClose).linear(startingPose, shootPoseClose);
         intakePath = Paths.curve(shootPoseClose,intakeMidPose,intakePose).linear(shootPoseClose,intakePose);
@@ -128,6 +142,10 @@ public class Shoot2CyclesAndParkAutoGeneral extends CommandOpMode {
         // TODO: things to run after initialize(), while the robot is still in Init (think auto config)
         // NOTE: if we're doing auto config here then we'll have to store it in a class member to pass it to preRun()
 
+        telemetry.addData("Shooter is present", shooter != null);
+        telemetry.addData("Intake is present", intake != null);
+        telemetry.addData("Limelight is present", limelight != null);
+
         driverGamepad.readButtons();
 
         if(driverGamepad.wasJustPressed(GamepadKeys.Button.CIRCLE)){
@@ -142,8 +160,16 @@ public class Shoot2CyclesAndParkAutoGeneral extends CommandOpMode {
 
         telemetry.addData("Alliance is (Press Circle to switch)", alliance);
         telemetry.addData("Park-side is (Press Triangle to switch)", parkSide);
+
         telemetry.update();
 
+    }
+
+    private boolean isTagVisible(List<Integer> ids) {
+        if (limelight == null)
+            return LIMELIGHT_FALLBACK_TAG_VISIBILITY;
+        else
+            return limelight.isTagVisible(ids);
     }
 
     @Override
@@ -173,7 +199,7 @@ public class Shoot2CyclesAndParkAutoGeneral extends CommandOpMode {
                 gardenIntakeCommand,
                 new FollowPathCommand(follower,gardenToScanPath),
                 new WaitUntilCommand(
-                        () -> limelight.isTagVisible(startTagIds)
+                        () -> isTagVisible(startTagIds)
                 ).withTimeout(TAG_WAIT_TIME),
                 new ConditionalCommand(
                         new SequentialCommandGroup(
@@ -185,7 +211,7 @@ public class Shoot2CyclesAndParkAutoGeneral extends CommandOpMode {
                         new SequentialCommandGroup(
                                 new ShootCommand(shooter, RobotConstants.SHOOT_SPEED_CLOSE).withTimeout(SHOOT_TIME),
                                 new FollowPathCommand(follower, parkPathNoTip)
-                        ),() -> !limelight.isTagVisible(startTagIds)
+                        ),() -> !isTagVisible(startTagIds)
                 )
         ));
     }

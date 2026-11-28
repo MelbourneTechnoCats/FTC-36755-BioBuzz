@@ -45,14 +45,22 @@ public class StarterbotCommandBasedTeleop extends CommandOpMode {
         );
         register(drive); // must be done before setting default command!
 
-        intake = new IntakeSubsystem(hardwareMap);
-        register(intake);
+        try {
+            intake = new IntakeSubsystem(hardwareMap);
+            register(intake);
+        } catch (Exception e) {
 
-        shooter = new ShooterSubsystem(
-                hardwareMap,
-                RobotConstants.LAUNCHER_MOTOR_NAME, RobotConstants.WINDMILL_SERVO_NAME
-        );
-        register(shooter);
+        }
+
+        try {
+            shooter = new ShooterSubsystem(
+                    hardwareMap,
+                    RobotConstants.LAUNCHER_MOTOR_NAME, RobotConstants.WINDMILL_SERVO_NAME
+            );
+            register(shooter);
+        } catch (Exception e) {
+
+        }
 
         driverGamepad = new GamepadEx(gamepad1);
         mechGamepad = new GamepadEx(gamepad2);
@@ -64,18 +72,20 @@ public class StarterbotCommandBasedTeleop extends CommandOpMode {
                 () -> driverGamepad.getRightX()
         ));
 
-        intake.setDefaultCommand(new IntakeCommand(
-                intake,
-                () -> {
-                    double power = (
-                            driverGamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER)
-                            - driverGamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER)
-                    );
-                    if (shooter.isTargetVelocityReached())
-                        power += 0.5;
-                    return power;
-                }
-        ));
+        if(intake != null){
+            intake.setDefaultCommand(new IntakeCommand(
+                    intake,
+                    () -> {
+                        double power = (
+                                driverGamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER)
+                                - driverGamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER)
+                        );
+                        if (shooter != null && shooter.isTargetVelocityReached())
+                            power += 0.5;
+                        return power;
+                    }
+            ));
+        }
 
         driverGamepad.getGamepadButton(GamepadKeys.Button.PS)
                 .whenPressed(() -> {
@@ -87,50 +97,53 @@ public class StarterbotCommandBasedTeleop extends CommandOpMode {
                         drive
                 ));
 
-        GamepadButton rightBumper = mechGamepad.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER);
-        GamepadButton leftBumper = mechGamepad.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER);
-        rightBumper
-                .and(leftBumper.negate())
-                .whileActiveContinuous(new ShootCommand(shooter, () -> shootSpeedClose));
+        if (shooter != null) {
+            GamepadButton rightBumper = mechGamepad.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER);
+            GamepadButton leftBumper = mechGamepad.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER);
+
+            rightBumper
+                    .and(leftBumper.negate())
+                    .whileActiveContinuous(new ShootCommand(shooter, () -> shootSpeedClose));
 
 
-        leftBumper
-                .and(rightBumper.negate())
-                .whileActiveContinuous(new ShootCommand(shooter, () -> shootSpeedFar));
+            leftBumper
+                    .and(rightBumper.negate())
+                    .whileActiveContinuous(new ShootCommand(shooter, () -> shootSpeedFar));
 
-        leftBumper
-                .and(rightBumper)
-                        .whileActiveContinuous(new ShootCommand(shooter, ShooterTargeting.calculateVelocity(drive.getTargetDistance())));
+            leftBumper
+                    .and(rightBumper)
+                    .whileActiveContinuous(new ShootCommand(shooter, ShooterTargeting.calculateVelocity(drive.getTargetDistance())));
 
-        mechGamepad.getGamepadButton(GamepadKeys.Button.DPAD_UP)
-                .whenPressed(() -> {
-                    double newSpeed = shootSpeedClose + SHOOTER_CHANGE_STEP;
-                    if (newSpeed <= ShooterSubsystem.MAX_TICKS_PER_SECOND) {
-                        shootSpeedClose = newSpeed;
-                    }
-                });
-        mechGamepad.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
-                .whenPressed(() -> {
-                    double newSpeed = shootSpeedClose - SHOOTER_CHANGE_STEP;
-                    if (newSpeed >= SHOOTER_MIN_SPEED) {
-                        shootSpeedClose = newSpeed;
-                    }
-                });
+            mechGamepad.getGamepadButton(GamepadKeys.Button.DPAD_UP)
+                    .whenPressed(() -> {
+                        double newSpeed = shootSpeedClose + SHOOTER_CHANGE_STEP;
+                        if (newSpeed <= ShooterSubsystem.MAX_TICKS_PER_SECOND) {
+                            shootSpeedClose = newSpeed;
+                        }
+                    });
+            mechGamepad.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
+                    .whenPressed(() -> {
+                        double newSpeed = shootSpeedClose - SHOOTER_CHANGE_STEP;
+                        if (newSpeed >= SHOOTER_MIN_SPEED) {
+                            shootSpeedClose = newSpeed;
+                        }
+                    });
 
-        mechGamepad.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT)
-                .whenPressed(() -> {
-                    double newSpeed = shootSpeedFar + SHOOTER_CHANGE_STEP;
-                    if (newSpeed <= ShooterSubsystem.MAX_TICKS_PER_SECOND) {
-                        shootSpeedFar = newSpeed;
-                    }
-                });
-        mechGamepad.getGamepadButton(GamepadKeys.Button.DPAD_LEFT)
-                .whenPressed(() -> {
-                    double newSpeed = shootSpeedFar - SHOOTER_CHANGE_STEP;
-                    if (newSpeed >= SHOOTER_MIN_SPEED) {
-                        shootSpeedFar = newSpeed;
-                    }
-                });
+            mechGamepad.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT)
+                    .whenPressed(() -> {
+                        double newSpeed = shootSpeedFar + SHOOTER_CHANGE_STEP;
+                        if (newSpeed <= ShooterSubsystem.MAX_TICKS_PER_SECOND) {
+                            shootSpeedFar = newSpeed;
+                        }
+                    });
+            mechGamepad.getGamepadButton(GamepadKeys.Button.DPAD_LEFT)
+                    .whenPressed(() -> {
+                        double newSpeed = shootSpeedFar - SHOOTER_CHANGE_STEP;
+                        if (newSpeed >= SHOOTER_MIN_SPEED) {
+                            shootSpeedFar = newSpeed;
+                        }
+                    });
+        }
     }
 
     @Override
