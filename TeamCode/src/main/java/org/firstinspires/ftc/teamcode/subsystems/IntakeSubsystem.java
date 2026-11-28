@@ -13,6 +13,7 @@ import org.firstinspires.ftc.teamcode.RobotConstants;
 
 public class IntakeSubsystem extends SubsystemBase {
     private final Motor intakeMotor;
+
     private CRServo leftServo;
     private CRServo rightServo;
     private CRServoGroup servoGroup;
@@ -22,6 +23,7 @@ public class IntakeSubsystem extends SubsystemBase {
     ) {
         intakeMotor = new Motor(hardwareMap, RobotConstants.INTAKE_MOTOR_NAME, Motor.GoBILDA.RPM_117);
         intakeMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        intakeMotor.setInverted(true);
 
         try {
             leftServo = new CRServo(hardwareMap, RobotConstants.LEFT_INTAKE_SERVO_NAME);
