@@ -15,8 +15,8 @@ public class RobotConstants {
     public static final String LAUNCHER_MOTOR_NAME = "launcher";
     public static final String WINDMILL_SERVO_NAME = "windmillServo";
 
-    public static final double PINPOINT_X_OFFSET = 2.4583929167019103;
-    public static final double PINPOINT_Y_OFFSET = -1.1172359196219859;
+    public static final double PINPOINT_X_OFFSET = -0.4748644791250154;
+    public static final double PINPOINT_Y_OFFSET = -4.549142131655235;
     public static final DistanceUnit PINPOINT_OFFSET_UNIT = DistanceUnit.INCH;
 
     public static final double SHOOT_SPEED_CLOSE = 1100;
