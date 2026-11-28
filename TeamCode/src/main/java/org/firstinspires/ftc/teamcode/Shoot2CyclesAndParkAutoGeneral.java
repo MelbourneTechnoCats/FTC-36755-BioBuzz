@@ -105,9 +105,7 @@ public class Shoot2CyclesAndParkAutoGeneral extends CommandOpMode {
 
         follower = Constants.createFollower(hardwareMap);
         follower.setPose(startingPose);
-        RobotState.robotPose = new Pose2d(
-                startingPose.x(), startingPose.y(), startingPose.heading()
-        );
+        RobotState.updateRobotPose(startingPose); // initialise robot pose to starting pose from auto - in case we do not proceed with starting
 
         shooter = new ShooterSubsystem(hardwareMap, RobotConstants.LAUNCHER_MOTOR_NAME, RobotConstants.WINDMILL_SERVO_NAME);
         register(shooter);
@@ -204,10 +202,9 @@ public class Shoot2CyclesAndParkAutoGeneral extends CommandOpMode {
         // publish robot position data
         Pose pose = follower.pose();
         telemetry.addData("Pose", "heading: %.2f deg, X: %.2f in, Y: %.2f in", Math.toDegrees(pose.heading()), pose.x(), pose.y());
+        RobotState.updateRobotPose(pose);
+
         telemetry.addData("Tag visible", limelight.isTagVisible((alliance == Alliance.BLUE) ? LimelightSubsystem.BLUE_CLOSE_IDS : LimelightSubsystem.RED_CLOSE_IDS));
-        RobotState.robotPose = new Pose2d(
-                pose.x(), pose.y(), pose.heading()
-        );
 
         telemetry.update();
     }

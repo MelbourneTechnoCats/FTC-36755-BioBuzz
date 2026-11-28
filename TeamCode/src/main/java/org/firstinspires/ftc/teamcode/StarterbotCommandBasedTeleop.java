@@ -39,7 +39,6 @@ public class StarterbotCommandBasedTeleop extends CommandOpMode {
                 RobotConstants.PINPOINT_NAME
         );
         register(drive); // must be done before setting default command!
-        drive.setPose(RobotState.robotPose);
 
         intake = new IntakeSubsystem(hardwareMap);
         register(intake);
@@ -102,12 +101,18 @@ public class StarterbotCommandBasedTeleop extends CommandOpMode {
     }
 
     @Override
+    public void preRun() {
+        drive.setPose(RobotState.robotPose); // pose setting must be done in preRun(), otherwise pinpoint.resetPosAndIMU() will reset the pose too
+    }
+
+    @Override
     public void run() {
         super.run();
 
         // publish robot position data
         Pose2d pose = drive.getPose();
-        telemetry.addData("Pose", "heading: %.2f deg, X: %.2f in, Y: %.2f in", Math.toDegrees(pose.getHeading()), pose.getX(), pose.getY());
+        telemetry.addData("Current pose", "heading: %.2f deg, X: %.2f in, Y: %.2f in", Math.toDegrees(pose.getHeading()), pose.getX(), pose.getY());
+        RobotState.updateRobotPose(pose);
 
         telemetry.addData("Field-Centric", isFieldCentric);
         telemetry.addData("Shooter speed", shooterSpeed);
