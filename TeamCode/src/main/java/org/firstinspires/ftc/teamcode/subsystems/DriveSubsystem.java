@@ -8,11 +8,13 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 import com.seattlesolvers.solverslib.drivebase.MecanumDrive;
 import com.seattlesolvers.solverslib.geometry.Pose2d;
+import com.seattlesolvers.solverslib.geometry.Vector2d;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
 
 public class DriveSubsystem extends SubsystemBase {
     private final Motor leftFrontDrive;
@@ -90,5 +92,19 @@ public class DriveSubsystem extends SubsystemBase {
     public void driveFieldCentric(double forward, double strafe, double rotate) {
         drive.driveFieldCentric(strafe, forward, rotate, Math.toDegrees(getPose().getHeading()));
         // driveFieldCentric() assumes heading in degrees
+    }
+
+    public static final double CELL_X = 60;
+    public static final double CELL_Y_CLOSE = 60;
+    public static final double CELL_Y_FAR = 144 - CELL_Y_CLOSE;
+
+    public Vector2d getTargetPosition(){
+        Pose2d pose = getPose();
+        return new Vector2d(CELL_X, (pose.getY() > 72) ? CELL_Y_FAR : CELL_Y_CLOSE);
+    }
+    public double getTargetDistance(){
+        Vector2d targetPosition = getTargetPosition();
+        Vector2d currentPosition = new Vector2d(getPose());
+        return targetPosition.minus(currentPosition).magnitude();
     }
 }

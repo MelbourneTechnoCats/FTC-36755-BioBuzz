@@ -109,6 +109,8 @@ public class StarterbotCommandBasedTeleop extends CommandOpMode {
     public void run() {
         super.run();
 
+        telemetry.addData("Distance to target shooting position", drive.getTargetDistance());
+
         // publish robot position data
         Pose2d pose = drive.getPose();
         telemetry.addData("Current pose", "heading: %.2f deg, X: %.2f in, Y: %.2f in", Math.toDegrees(pose.getHeading()), pose.getX(), pose.getY());
