@@ -13,9 +13,7 @@ import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
 import com.seattlesolvers.solverslib.command.WaitUntilCommand;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
-import com.seattlesolvers.solverslib.geometry.Pose2d;
 import com.seattlesolvers.solverslib.pedroCommand.FollowPathCommand;
-import com.seattlesolvers.solverslib.util.Timing;
 
 import org.firstinspires.ftc.teamcode.commands.IntakeCommand;
 import org.firstinspires.ftc.teamcode.commands.ShootCommand;
@@ -87,7 +85,6 @@ public class Shoot2CyclesAndParkAutoGeneral extends CommandOpMode {
 
     private Path gardenToScanPath;
 
-    private static final double SHOOT_SPEED = 1100;
     private static final long SHOOT_TIME = 6000;
 
     private static final double INTAKE_POWER = 1;
@@ -172,7 +169,7 @@ public class Shoot2CyclesAndParkAutoGeneral extends CommandOpMode {
 
         schedule(new SequentialCommandGroup(
                 new FollowPathCommand(follower, shootPath, true),
-                new ShootCommand(shooter, SHOOT_SPEED).withTimeout(SHOOT_TIME),
+                new ShootCommand(shooter, RobotConstants.SHOOT_SPEED_CLOSE).withTimeout(SHOOT_TIME),
                 gardenIntakeCommand,
                 new FollowPathCommand(follower,gardenToScanPath),
                 new WaitUntilCommand(
@@ -181,12 +178,12 @@ public class Shoot2CyclesAndParkAutoGeneral extends CommandOpMode {
                 new ConditionalCommand(
                         new SequentialCommandGroup(
                                 new FollowPathCommand(follower, shootPathTip),
-                                new ShootCommand(shooter, SHOOT_SPEED).withTimeout(SHOOT_TIME),
+                                new ShootCommand(shooter, RobotConstants.SHOOT_SPEED_CLOSE).withTimeout(SHOOT_TIME),
                                 new FollowPathCommand(follower, parkPathTip)
 
                         ),
                         new SequentialCommandGroup(
-                                new ShootCommand(shooter, SHOOT_SPEED).withTimeout(SHOOT_TIME),
+                                new ShootCommand(shooter, RobotConstants.SHOOT_SPEED_CLOSE).withTimeout(SHOOT_TIME),
                                 new FollowPathCommand(follower, parkPathNoTip)
                         ),() -> !limelight.isTagVisible(startTagIds)
                 )
